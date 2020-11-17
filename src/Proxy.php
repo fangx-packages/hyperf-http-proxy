@@ -66,7 +66,7 @@ class Proxy
             throw new HttpProxyException($exception);
         }
 
-        return $response;
+        return $this->toResponse($response);
     }
 
     public function withAddMiddleware(ProxyMiddleware $middleware): self
