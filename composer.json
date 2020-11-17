@@ -15,12 +15,17 @@
     ],
     "require": {
         "php": "^7.2.0",
-        "ext-json": "*"
+        "ext-json": "*",
+        "hyperf/guzzle": "^2.0",
+        "hyperf/http-message": "^2.0",
+        "hyperf/utils": "^2.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "*",
+        "friendsofphp/php-cs-fixer": "^2.16",
+        "hyperf/http-server": "^2.0",
+        "hyperf/logger": "^2.0",
         "phpstan/phpstan": "^0.12",
-        "friendsofphp/php-cs-fixer": "^2.16"
+        "phpunit/phpunit": "*"
     },
     "autoload": {
         "psr-4": {

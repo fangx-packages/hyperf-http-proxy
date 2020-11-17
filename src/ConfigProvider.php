@@ -1,14 +1,17 @@
 <?php
 
 declare(strict_types=1);
+
 /**
- * Fangx's Package.
+ * Fangx's Packages
  *
  * @link     https://nfangxu.com
  * @document https://pkg.nfangxu.com
  * @contact  nfangxu@gmail.com
+ * @author   nfangxu
  * @license  https://pkg.nfangxu.com/license
  */
+
 namespace Fangx\HttpProxy;
 
 class ConfigProvider
@@ -30,12 +33,12 @@ class ConfigProvider
                 ],
             ],
             'publish' => [
-//                [
-//                    'id' => 'config',
-//                    'description' => 'The config for hyperf component.',
-//                    'source' => __DIR__ . '/../publish/config.php',
-//                    'destination' => BASE_PATH . '/config/autoload/package-name.php',
-//                ],
+                [
+                    'id' => 'config',
+                    'description' => 'The config for http-proxy component.',
+                    'source' => __DIR__ . '/../publish/config.php',
+                    'destination' => BASE_PATH . '/config/autoload/http-proxy.php',
+                ],
             ],
         ];
     }
