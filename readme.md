@@ -60,12 +60,13 @@ return [
 
 ### Usage
 
-如下所示, 所有请求 `/proxy/*` 的路由都会转发到 `http://127.0.0.1:9502/open-api/*`
+如下所示, 所有请求 `/proxy/*` 都会转发到 `http://127.0.0.1:9502/open-api/*`, 所有请求 `/proxy-other/*` 都会转发到 `http://127.0.0.1:9503/open-api/*`
 
 > 路由
 
 ```php
 Router::addRoute(['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'PATCH'], '/proxy/{uri:.*}', [IndexController::class, 'proxy']);
+Router::addRoute(['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'PATCH'], '/proxy-other/{uri:.*}', [IndexController::class, 'proxyOther']);
 ```
 
 > 控制器
@@ -80,6 +81,11 @@ class IndexController
     public function proxy(RequestInterface $request, ProxyFactory $factory)
     {
         return $factory->make()->proxy($request, $request->route('uri'));
+    }
+    
+    public function proxyOther(RequestInterface $request, ProxyFactory $factory)
+    {
+        return $factory->make('other')->proxy($request, $request->route('uri'));
     }
 }
 ```
