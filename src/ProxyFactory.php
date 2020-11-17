@@ -66,7 +66,7 @@ class ProxyFactory
     {
         $middlewares = [];
 
-        foreach ($this->getConfig($proxy, 'middlewares') as $middleware) {
+        foreach ((array)$this->getConfig($proxy, 'middlewares') as $middleware) {
             if (! is_object($middleware)) {
                 $middleware = clone $this->container->get($middleware);
             }
@@ -84,6 +84,6 @@ class ProxyFactory
     private function getConfig(string $proxy, string $key)
     {
         return Arr::get($this->config, sprintf('proxy.%s.%s', $proxy, $key))
-            ?: Arr::get($this->config, sprintf('proxy.%s', $key));
+            ?: Arr::get($this->config, $key);
     }
 }
