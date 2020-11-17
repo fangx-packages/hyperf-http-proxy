@@ -15,6 +15,9 @@ declare(strict_types=1);
 namespace Fangx\HttpProxy;
 
 use Fangx\HttpProxy\Contract\ProxyMiddleware;
+use Fangx\HttpProxy\Middleware\KeepRequestHeaders;
+use Fangx\HttpProxy\Middleware\KeepResponseHeaders;
+use Fangx\HttpProxy\Middleware\ProxyUri;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Utils;
 use Hyperf\HttpMessage\Stream\SwooleStream;
@@ -61,12 +64,26 @@ class Proxy
     public function proxy(RequestInterface $request, string $path = '')
     {
         try {
-            $response = $this->client()->send($this->toRequest($request, $path));
+            $response = $this
+                // transfer uri
+                ->withAddMiddleware(new ProxyUri(
+                    $this->config['scheme'] ?? 'http',
+                    $this->config['host'] ?? '',
+                    $this->config['port'] ?? 80,
+                    $this->config['path'] ?? '',
+                    $path
+                ))
+                // remove request headers
+                ->withAddMiddleware(new KeepRequestHeaders($this->keepRequestHeaders))
+                // remove response headers
+                ->withAddMiddleware(new KeepResponseHeaders($this->keepResponseHeaders))
+                ->client()
+                ->send($this->toGzRequest($request));
         } catch (Throwable $exception) {
             throw new HttpProxyException($exception);
         }
 
-        return $this->toResponse($response);
+        return $this->toSwResponse($response);
     }
 
     public function withAddMiddleware(ProxyMiddleware $middleware): self
@@ -76,37 +93,13 @@ class Proxy
         return $new;
     }
 
-    protected function toRequest(RequestInterface $request, string $path = '')
+    protected function toGzRequest(RequestInterface $request)
     {
-        $path = $path ?: $request->getUri()->getPath();
-
-        $uri = $request->getUri()
-            ->withScheme($this->config['scheme'] ?? 'http')
-            ->withHost($this->config['host'] ?? '127.0.0.1')
-            ->withPort($this->config['port'] ?? 80)
-            ->withPath(sprintf('/%s/%s', trim($this->config['path'] ?? '', '/'), ltrim($path, '/')));
-
-        foreach ($request->getHeaders() as $header => $value) {
-            if (! in_array($header, $this->keepRequestHeaders)) {
-                $request = $request->withoutHeader($header);
-            }
-        }
-
-        return $request->withUri($uri)->withBody(Utils::streamFor($request->getBody()->getContents()));
+        return $request->withBody(Utils::streamFor($request->getBody()->getContents()));
     }
 
-    /**
-     * @return ResponseInterface
-     */
-    protected function toResponse(ResponseInterface $psrResponse)
+    protected function toSwResponse(ResponseInterface $psrResponse)
     {
-        foreach ($psrResponse->getHeaders() as $header => $value) {
-            if (! in_array($header, $this->keepResponseHeaders)) {
-                $psrResponse = $psrResponse->withoutHeader($header);
-                continue;
-            }
-        }
-
         return $psrResponse->withBody(new SwooleStream($psrResponse->getBody()->getContents()));
     }
 
