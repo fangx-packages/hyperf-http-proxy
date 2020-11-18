@@ -218,3 +218,19 @@ class LoggerMiddleware extends ProxyMiddleware
 }
 
 ```
+
+
+### Guzzle Exception
+
+> \GuzzleHttp\Exception;
+
+- GuzzleException
+    - SeekException
+    - InvalidArgumentException
+    - TransferException
+        - RequestException
+            - TooManyRedirectsException
+            - ConnectException
+            - BadResponseException
+                - ServerException
+                - ClientException
